@@ -81,72 +81,69 @@ def load_case_data():
 
 df = load_case_data()
 
-# --- Navigation Tabs (Exactly Three Specific Tabs) ---
-tab1, tab2, tab3 = st.tabs([
-    "🎯 RC Dwivedi and Amit dwivedi", 
-    "👩‍⚖️ RC Dwivedi and Richa dwivedi", 
+# --- Navigation Tabs (Exactly Two Combined Tabs) ---
+tab1, tab2 = st.tabs([
+    "🎯 RC Dwivedi, Amit dwivedi and Richa dwivedi", 
     "🏛️ Monthly High Court Bulletin"
 ])
 
-# --- TAB 1: RC DWIVEDI AND AMIT DWIVEDI ---
+# --- TAB 1: CONSOLIDATED OFFICE PANEL ---
 with tab1:
-    st.subheader("📋 Active Team Briefs: R.C. Dwivedi & Amit Dwivedi")
+    st.subheader("📋 Active Office Briefs Registry")
+    st.markdown("This panel displays high court matters actively handled or defended by the joint practice team of **Mr. Ramesh Chandra Dwivedi**, **Mr. Amit Dwivedi**, and **Ms. Richa Dwivedi**.")
+    st.markdown("---")
     
-    # Filter for cases involving Amit Dwivedi
-    amit_df = df[
-        df["Advocate (Petitioner)"].str.contains("Amit Dwivedi", case=False, na=False) |
-        df["Advocate (Respondent)"].str.contains("Amit Dwivedi", case=False, na=False)
-    ]
+    # Unified filter logic to extract cases belonging to anyone on the team
+    team_search_terms = ["Amit Dwivedi", "Richa Dwivedi", "Ramesh Chandra Dwivedi", "R C Dwivedi"]
     
-    for idx, row in amit_df.iterrows():
-        with st.expander(f"💼 {row['Case Number']} — {row['Petitioner/Respondent']}", expanded=True):
-            c1, c2 = st.columns(2)
-            with c1:
-                st.write(f"**Category:** `{row['Category']}`")
-                st.write(f"**Counsel for Petitioner:** {row['Advocate (Petitioner)']}")
-            with c2:
-                st.write(f"**Next Hearing Date:** `{row['Next Hearing Date']}`")
-                st.write(f"**Current Status:** {row['Status']}")
-            st.markdown("---")
-            st.info(f"📝 **Order Synopsis:**\n{row['Synopsis']}")
-
-# --- TAB 2: RC DWIVEDI AND RICHA DWIVEDI (NEW) ---
-with tab2:
-    st.subheader("📋 Active Team Briefs: R.C. Dwivedi & Richa Dwivedi")
-    st.markdown("This panel displays high court matters argued or managed jointly by **Mr. Ramesh Chandra Dwivedi** and **Ms. Richa Dwivedi**.")
+    # Creating boolean masks for text matches
+    pet_mask = df["Advocate (Petitioner)"].str.contains('|'.join(team_search_terms), case=False, na=False)
+    resp_mask = df["Advocate (Respondent)"].str.contains('|'.join(team_search_terms), case=False, na=False)
     
-    # Filter for cases involving Richa Dwivedi
-    richa_df = df[
-        df["Advocate (Petitioner)"].str.contains("Richa Dwivedi", case=False, na=False) |
-        df["Advocate (Respondent)"].str.contains("Richa Dwivedi", case=False, na=False)
-    ]
+    team_df = df[pet_mask | resp_mask]
     
-    if not richa_df.empty:
-        for idx, row in richa_df.iterrows():
-            with st.expander(f"⚖️ {row['Case Number']} — {row['Petitioner/Respondent']}", expanded=True):
+    if not team_df.empty:
+        # High-level metrics for the entire office
+        m_col1, m_col2, m_col3 = st.columns(3)
+        m_col1.metric(label="Total Team Briefs", value=len(team_df))
+        m_col2.metric(label="Active Matters", value=len(team_df[team_df["Status"].str.contains("Adjourned|Passed|Pending")]))
+        m_col3.metric(label="Disposed / Closed", value=len(team_df[team_df["Status"].str.contains("Disposed")]))
+        st.markdown("---")
+        
+        # Displaying the consolidated team cases
+        for idx, row in team_df.iterrows():
+            # Color indicator depending on active/disposed status
+            badge = "🟢" if "Disposed" not in row["Status"] else "⚪"
+            
+            with st.expander(f"{badge} {row['Case Number']} — {row['Petitioner/Respondent']}", expanded=True):
                 c1, c2 = st.columns(2)
                 with c1:
                     st.write(f"**Category:** `{row['Category']}`")
-                    st.write(f"**Counsel on Record:** `{row['Advocate (Petitioner)']}`")
+                    st.write(f"**Counsel for Petitioner:** {row['Advocate (Petitioner)']}")
+                    st.write(f"**Counsel for Respondent:** {row['Advocate (Respondent)']}")
                 with c2:
-                    st.write(f"**Listing Timeline:** `{row['Next Hearing Date']}`")
-                    st.write(f"**Registry Status:** {row['Status']}")
+                    st.write(f"**Next Hearing / Timeline:** `{row['Next Hearing Date']}`")
+                    st.write(f"**Current Status Flag:** {row['Status']}")
                 st.markdown("---")
-                st.success(f"📝 **Judgment / Brief Synopsis:**\n{row['Synopsis']}")
+                
+                # Check which team member is highlighted and adapt the success message container
+                if "Richa" in row["Advocate (Petitioner)"]:
+                    st.success(f"📝 **Order Synopsis (Richa & R.C. Dwivedi):**\n{row['Synopsis']}")
+                else:
+                    st.info(f"📝 **Order Synopsis (Amit & R.C. Dwivedi):**\n{row['Synopsis']}")
     else:
-        st.warning("No active records indexed under this specific pairing.")
+        st.warning("No records indexed matching the office team parameters.")
 
-# --- TAB 3: MONTHLY HIGH COURT BULLETIN ---
-with tab2: # Note: st.tabs assignment handles this down here
-    pass # Managed dynamically by Streamlit view rendering
-
-with tab3:
+# --- TAB 2: MONTHLY HIGH COURT BULLETIN ---
+with tab2:
     st.subheader("🏛️ General Legal Trends: Important Educational & Criminal Matters")
     st.markdown("---")
     
     col_ed, col_crim = st.columns(2)
     with col_ed:
         st.markdown("### 📚 Featured Education Matters")
+        st.caption("Focus on U.P. Intermediate Education Act, 1921 & Service Regulations")
+        
         ed_df = df[df["Category"].str.contains("Education", case=False)]
         for idx, row in ed_df.iterrows():
             st.error(f"**{row['Case Number']}**")
@@ -157,6 +154,8 @@ with tab3:
 
     with col_crim:
         st.markdown("### ⚖️ Featured Criminal Matters")
+        st.caption("Focus on Appeals, Bail Applications, and Procedural Updates")
+        
         crim_df = df[df["Category"].str.contains("Criminal", case=False)]
         for idx, row in crim_df.iterrows():
             st.warning(f"**{row['Case Number']}**")
