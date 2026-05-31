@@ -66,12 +66,12 @@ def load_case_data():
 df = load_case_data()
 
 # --- Navigation Tabs (Exactly Two Tabs) ---
-tab1, tab2 = st.tabs(["🎯 My Cases (Amit Dwivedi & R C Dwivedi)", "🏛️ Monthly High Court Bulletin"])
+tab1, tab2 = st.tabs(["🎯 RC Dwivedi and Amit dwivedi", "🏛️ Monthly High Court Bulletin"])
 
-# --- TAB 1: MY CASES (DEDICATED PANEL) ---
+# --- TAB 1: RC DWIVEDI AND AMIT DWIVEDI ---
 with tab1:
     st.subheader("📋 Active Office Briefs Registry")
-    st.markdown("This panel displays cases actively handled or defended by **Mr. Amit Dwivedi** and **Mr. Ramesh Chandra Dwivedi**.")
+    st.markdown("This panel displays cases actively handled or defended by **Mr. Ramesh Chandra Dwivedi** and **Mr. Amit Dwivedi**.")
     
     # Precise search strings to capture matching variants
     search_term_1 = "Amit Dwivedi"
