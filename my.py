@@ -10,14 +10,15 @@ st.markdown("---")
 # --- Sample Data Loader (Replace with your actual scraping/log payload) ---
 @st.cache_data
 def load_case_data():
-    # This simulates your central data sheet. Replace with actual scraping dataframe logic.
+    # Real data mapped directly from the High Court Order dated May 25, 2026
     data = {
-        "Case Number": ["WRIT-C No. 1042 of 2026", "SERB No. 4921 of 2026", "CRL-A No. 883 of 2026"],
-        "Petitioner/Respondent": ["Suresh Kumar vs State of U.P.", "Ramesh Singh vs Union of India", "Anand Prakash vs State of U.P."],
-        "Advocate (Petitioner)": ["Amit Dwivedi, R C Dwivedi", "Other Advocate", "Amit Dwivedi"],
-        "Advocate (Respondent)": ["C.S.C.", "Amit Dwivedi, R C Dwivedi", "C.S.C."],
-        "Next Hearing Date": ["2026-06-15", "2026-06-22", "2026-07-02"],
-        "Status": ["Fresh / Listed", "Pending", "Disposed"]
+        "Case Number": ["WRIC No. 17230 of 2026"],
+        "Petitioner/Respondent": ["Smt. Munni Devi vs State of U.P. And 4 Others"],
+        "Advocate (Petitioner)": ["Amit Dwivedi, Ramesh Chandra Dwivedi"],
+        "Advocate (Respondent)": ["C.S.C., Krishna Agarawal, Narendra Kumar Tiwari"],
+        "Next Hearing Date": ["2026-07-10"],
+        "Status": ["Adjourned / Listed as Fresh"],
+        "Synopsis": ["Challenging DM order demanding Rs. 29,474 for shifting a tilted electric pole. DB suggested electricity company reinforce foundation instead of charging petitioner. Put up on July 10."]
     }
     return pd.DataFrame(data)
 
